@@ -1,0 +1,56 @@
+# The backend service. Later we'll lock this down with an
+# AuthorizationPolicy so ONLY the frontend can call it.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backend
+  namespace: mesh-demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: mesh-demo
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      serviceAccountName: backend
+      containers:
+        - name: backend
+          image: hashicorp/http-echo:1.0
+          args:
+            - "-text=Hello from BACKEND"
+            - "-listen=:5678"
+          ports:
+            - containerPort: 5678
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: mesh-demo
+  labels:
+    app: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http          # Istio requires named ports with protocol prefix
+      port: 5678
+      targetPort: 5678
