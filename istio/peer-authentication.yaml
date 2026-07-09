@@ -1,0 +1,11 @@
+# Enforces STRICT mutual TLS for all workloads in mesh-demo.
+# After this, any client without a valid Istio-issued certificate
+# is rejected at the sidecar — before the request reaches the app.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: mesh-demo
+spec:
+  mtls:
+    mode: STRICT
