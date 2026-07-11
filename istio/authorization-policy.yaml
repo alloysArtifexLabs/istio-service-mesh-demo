@@ -1,0 +1,21 @@
+# Locks the backend to accept requests ONLY from the frontend's
+# ServiceAccount identity. Every other identity is denied — even
+# with a valid mTLS certificate.
+#
+# The principal format is:
+#   cluster.local/ns/<namespace>/sa/<serviceaccount>
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: backend-allow-frontend
+  namespace: mesh-demo
+spec:
+  selector:
+    matchLabels:
+      app: backend          # this policy protects the backend
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals:
+              - "cluster.local/ns/mesh-demo/sa/frontend"

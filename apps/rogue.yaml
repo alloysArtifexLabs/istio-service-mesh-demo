@@ -1,0 +1,39 @@
+# An in-mesh pod with its OWN identity (not frontend).
+# It has a sidecar and a valid cert, so mTLS lets it in.
+# After the AuthorizationPolicy, it should be DENIED —
+# proving authz is separate from authentication.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rogue
+  namespace: mesh-demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rogue
+  namespace: mesh-demo
+  labels:
+    app: rogue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rogue
+  template:
+    metadata:
+      labels:
+        app: rogue
+    spec:
+      serviceAccountName: rogue
+      containers:
+        - name: rogue
+          image: curlimages/curl:8.10.1
+          command: ["sleep", "3600"]
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
