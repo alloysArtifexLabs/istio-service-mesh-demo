@@ -1,0 +1,16 @@
+# Defines named subsets of the frontend service based on the
+# 'version' pod label. The VirtualService references these by name.
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: frontend
+  namespace: mesh-demo
+spec:
+  host: frontend
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2

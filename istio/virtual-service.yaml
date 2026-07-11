@@ -1,0 +1,21 @@
+# Routes 90% of traffic to v1 (stable) and 10% to v2 (canary).
+# To progress the canary, change the weights and re-apply —
+# no redeploy, no restart, no application change.
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: frontend
+  namespace: mesh-demo
+spec:
+  hosts:
+    - frontend
+  http:
+    - route:
+        - destination:
+            host: frontend
+            subset: v1
+          weight: 90
+        - destination:
+            host: frontend
+            subset: v2
+          weight: 10
